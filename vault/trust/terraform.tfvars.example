@@ -1,2 +1,2 @@
-tfc_organization_name = "<YOUR_ORG>"
+tfc_organization_name = "audit_log_test_org"
 tfc_workspace_name    = "learn-terraform-dynamic-credentials"

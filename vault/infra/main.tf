@@ -14,7 +14,10 @@ resource "vault_kv_secret_v2" "example" {
   delete_all_versions = true
   data_json = jsonencode(
     {
-      foo = "bar"
+      ani = "dev"
+    },
+    {
+      siva = "dev"
     }
   )
 }
