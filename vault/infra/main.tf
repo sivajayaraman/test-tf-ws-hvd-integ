@@ -15,7 +15,8 @@ resource "vault_kv_secret_v2" "example" {
   data_json = jsonencode(
     {
       ani = "dev",
-      siva = "dev"
+      siva = "dev",
+      tony = "stark"
     }
   )
 }
