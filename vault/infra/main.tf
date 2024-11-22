@@ -22,7 +22,8 @@ resource "vault_kv_secret_v2" "example" {
       bgt  = "3-1",
       road = "block",
       tropic = "format",
-      max = "verstappen"
+      max = "verstappen",
+      role = "new-customer-ops"
     }
   )
 }
