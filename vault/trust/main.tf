@@ -12,7 +12,7 @@ resource "vault_jwt_auth_backend" "tfc_jwt" {
 
 resource "vault_jwt_auth_backend_role" "tfc_role" {
   backend        = vault_jwt_auth_backend.tfc_jwt.path
-  role_name      = "tfc-role"
+  role_name      = "tfc-role-new"
   token_policies = [vault_policy.tfc_policy.name]
 
   bound_audiences = [var.tfc_vault_audience]
@@ -28,7 +28,7 @@ resource "vault_jwt_auth_backend_role" "tfc_role" {
 }
 
 resource "vault_policy" "tfc_policy" {
-  name = "tfc-policy"
+  name = "tfc-policy-new"
 
   policy = <<EOT
 # Allow tokens to query themselves
