@@ -17,7 +17,9 @@ resource "vault_kv_secret_v2" "example" {
       ani  = "dev",
       siva = "dev",
       tony = "stark",
-      thor = "odinson"
+      thor = "odinson",
+      role = "tfc-role-new",
+      bgt  = "3-1" 
     }
   )
 }
