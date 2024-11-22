@@ -19,7 +19,10 @@ resource "vault_kv_secret_v2" "example" {
       tony = "stark",
       thor = "odinson",
       role = "tfc-role-new",
-      bgt  = "3-1" 
+      bgt  = "3-1",
+      road = "block",
+      tropic = "format",
+      max = "verstappen"
     }
   )
 }
