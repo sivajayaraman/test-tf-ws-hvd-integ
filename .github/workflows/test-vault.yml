@@ -24,6 +24,9 @@ jobs:
           secrets: |
             secret/data/production/app username | VAULT_USERNAME ;
             secret/data/production/app password | VAULT_PASSWORD
+        env:
+          VAULT_SKIP_VERIFY: true
+
       - name: Dump OIDC Token Claims
         run: |
           echo "${ACTIONS_ID_TOKEN}" | cut -d '.' -f2 | base64 -d | jq
