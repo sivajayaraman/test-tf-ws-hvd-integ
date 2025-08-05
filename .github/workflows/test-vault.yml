@@ -3,14 +3,16 @@ name: Vault OIDC Test
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  VAULT_SKIP_VERIFY: true
+
 jobs:
-  vault-test:
+  vault-oidc-test:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      VAULT_SKIP_VERIFY: true
 
     steps:
       - name: Checkout
