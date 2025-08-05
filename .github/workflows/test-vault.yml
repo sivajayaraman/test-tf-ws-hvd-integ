@@ -17,6 +17,21 @@ jobs:
 
       - name: Write Vault CA cert to file
         run: echo "${{ secrets.VAULT_CA }}" > vault-ca.pem
+      
+      - name: Write Vault CA cert to file
+        run: |
+          echo "$VAULT_CA" > vault-ca.pem
+        env:
+          VAULT_CA: ${{ secrets.VAULT_CA }}
+
+      - name: Debug cert
+        run: |
+          ls -l vault-ca.pem
+          cat vault-ca.pem
+      
+      - name: Test curl with CA cert
+        run: |
+          curl --cacert vault-ca.pem https://vault-cluster-dev-1304-public-vault-25036c28.52fe4c32.local.hcp.dev:8200/v1/sys/health | jq
 
       - name: Read secret from Vault
         uses: hashicorp/vault-action@v2.4.0
