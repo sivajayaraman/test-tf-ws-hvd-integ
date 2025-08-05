@@ -22,7 +22,7 @@ jobs:
           path: jwt
           role: myproject-production
           secrets: |
-            secret/data/production/app username | VAULT_USERNAME
+            secret/data/production/app username | VAULT_USERNAME ;
             secret/data/production/app password | VAULT_PASSWORD
       - name: Dump OIDC Token Claims
         run: |
