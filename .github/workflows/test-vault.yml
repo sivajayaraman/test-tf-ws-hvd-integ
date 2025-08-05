@@ -7,9 +7,6 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  VAULT_SKIP_VERIFY: true
-
 jobs:
   vault-oidc-test:
     runs-on: ubuntu-latest
