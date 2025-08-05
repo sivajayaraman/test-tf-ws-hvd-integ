@@ -9,6 +9,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    env:
+      VAULT_SKIP_VERIFY: true
 
     steps:
       - name: Checkout
@@ -24,8 +26,6 @@ jobs:
           secrets: |
             secret/data/production/app username | VAULT_USERNAME ;
             secret/data/production/app password | VAULT_PASSWORD
-        env:
-          VAULT_SKIP_VERIFY: true
 
       - name: Dump OIDC Token Claims
         run: |
