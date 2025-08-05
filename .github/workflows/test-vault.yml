@@ -29,6 +29,11 @@ jobs:
       - name: Test curl with CA cert
         run: |
           curl --cacert vault-ca.pem https://vault-cluster-dev-1304-public-vault-25036c28.52fe4c32.local.hcp.dev:8200/v1/sys/health | jq
+      
+      - name: Test curl with direct path
+        run: |
+          curl --cacert ${{ github.workspace }}/vault-ca.pem https://vault-cluster-dev-1304-public-vault-25036c28.52fe4c32.local.hcp.dev:8200/v1/sys/health | jq
+
 
       - name: Read secret from Vault
         uses: hashicorp/vault-action@v2.4.0
