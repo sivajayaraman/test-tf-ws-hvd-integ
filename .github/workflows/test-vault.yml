@@ -42,6 +42,7 @@ jobs:
             secret/data/production/app password | VAULT_PASSWORD
           exportEnv: true
           exportToken: false
+          tlsSkipVerify: false
           jwtTtl: 3600
         env:
           VAULT_CACERT: ${{ github.workspace }}/vault-ca.pem
