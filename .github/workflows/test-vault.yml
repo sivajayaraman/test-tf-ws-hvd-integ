@@ -39,23 +39,11 @@ jobs:
         uses: hashicorp/vault-action@v2.4.0
         with:
           url: https://vault-cluster-plus-public-vault-1e26e30b.d93627cf.z1.hashicorp.cloud:8200
+          namespace: admin
           method: jwt
-          path: jwt
           role: myproject-production
           secrets: |
-            secret/data/production/app username | VAULT_USERNAME ;
-            secret/data/production/app password | VAULT_PASSWORD
-          exportEnv: true
-          exportToken: false
-          tlsSkipVerify: false
-          jwtTtl: 3600
+            kv/data/production/app username | VAULT_USERNAME ;
+            kv/data/production/app password | VAULT_PASSWORD
         env:
           VAULT_CACERT: ${{ github.workspace }}/vault-ca.pem
-
-
-      - name: Dump OIDC Token Claims
-        run: |
-          echo "${ACTIONS_ID_TOKEN}" | cut -d '.' -f2 | base64 -d | jq
-        env:
-          ACTIONS_ID_TOKEN: ${{ steps.get-token.outputs.token }}
-        id: get-token
