@@ -16,9 +16,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Write Vault CA cert to file
-        run: echo "${{ secrets.VAULT_CA }}" > vault-ca.pem
-      
-      - name: Write Vault CA cert to file
         run: |
           echo "$VAULT_CA" > vault-ca.pem
         env:
