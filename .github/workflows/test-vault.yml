@@ -34,7 +34,7 @@ jobs:
           method: jwt
           role: myproject-production
           secrets: |
-            kv/data/production/app | APP_SECRET
+            kv/data/production/app username | APP_SECRET
 
       - name: Output things
         run: |
