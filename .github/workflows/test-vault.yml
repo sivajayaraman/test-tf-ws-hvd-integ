@@ -28,17 +28,17 @@ jobs:
       
       - name: Test curl with CA cert
         run: |
-          curl --cacert vault-ca.pem https://vault-cluster-dev-1304-public-vault-25036c28.52fe4c32.local.hcp.dev:8200/v1/sys/health | jq
+          curl --cacert vault-ca.pem https://vault-cluster-plus-public-vault-1e26e30b.d93627cf.z1.hashicorp.cloud:8200/v1/sys/health | jq
       
-      - name: Test curl with direct path
+      - name: Test curl with direct CA cert path
         run: |
-          curl --cacert ${{ github.workspace }}/vault-ca.pem https://vault-cluster-dev-1304-public-vault-25036c28.52fe4c32.local.hcp.dev:8200/v1/sys/health | jq
+          curl --cacert ${{ github.workspace }}/vault-ca.pem https://vault-cluster-plus-public-vault-1e26e30b.d93627cf.z1.hashicorp.cloud:8200/v1/sys/health | jq
 
 
       - name: Read secret from Vault
         uses: hashicorp/vault-action@v2.4.0
         with:
-          url: https://vault-cluster-dev-1304-public-vault-25036c28.52fe4c32.local.hcp.dev:8200
+          url: https://vault-cluster-plus-public-vault-1e26e30b.d93627cf.z1.hashicorp.cloud:8200
           method: jwt
           path: jwt
           role: myproject-production
