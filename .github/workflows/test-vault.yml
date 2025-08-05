@@ -47,3 +47,8 @@ jobs:
             kv/data/production/app password | VAULT_PASSWORD
         env:
           VAULT_CACERT: ${{ github.workspace }}/vault-ca.pem
+
+      - name: Revoke token
+        if: always()
+        run: |
+          curl -X POST -sv -H "X-Vault-Token: ${{ env.VAULT_TOKEN }}" https://vault-cluster-plus-public-vault-1e26e30b.d93627cf.z1.hashicorp.cloud:8200/v1/auth/token/revoke-self
