@@ -35,6 +35,8 @@ jobs:
           role: myproject-production
           secrets: |
             kv/data/production/app username | APP_SECRET
+        env:
+          VAULT_CA: ${{ secrets.VAULT_CA }}
 
       - name: Output things
         run: |
