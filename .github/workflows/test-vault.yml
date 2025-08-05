@@ -18,6 +18,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Write Vault CA cert to file
+        run: echo "${{ secrets.VAULT_CA }}" > vault-ca.pem
+
       - name: Read secret from Vault
         uses: hashicorp/vault-action@v2.4.0
         with:
@@ -28,6 +31,12 @@ jobs:
           secrets: |
             secret/data/production/app username | VAULT_USERNAME ;
             secret/data/production/app password | VAULT_PASSWORD
+          exportEnv: true
+          exportToken: false
+          jwtTtl: 3600
+        env:
+          VAULT_CACERT: ${{ github.workspace }}/vault-ca.pem
+
 
       - name: Dump OIDC Token Claims
         run: |
