@@ -1,0 +1,87 @@
+name: Test Vault OIDC with AWS Dynamic Credentials
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-vault-and-aws:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Retrieve static secrets from Vault
+        uses: hashicorp/vault-action@v3
+        with:
+          method: jwt
+          url: ${{ secrets.VAULT_URL }}
+          namespace: ${{ secrets.VAULT_NAMESPACE }}
+          role: github-actions-role
+          secrets: |
+            secret/data/github-actions/ci npmToken | NPM_TOKEN ;
+            secret/data/github-actions/ci apiKey | API_KEY ;
+            secret/data/ci/terraform tfToken | TF_TOKEN
+
+      - name: Retrieve AWS dynamic credentials from Vault
+        uses: hashicorp/vault-action@v3
+        with:
+          method: jwt
+          url: ${{ secrets.VAULT_URL }}
+          namespace: ${{ secrets.VAULT_NAMESPACE }}
+          role: github-actions-role
+          secrets: |
+            aws/creds/vault-demo-assumed-role access_key | AWS_ACCESS_KEY_ID ;
+            aws/creds/vault-demo-assumed-role secret_key | AWS_SECRET_ACCESS_KEY ;
+            aws/creds/vault-demo-assumed-role security_token | AWS_SESSION_TOKEN
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+      - name: Test AWS credentials and describe regions
+        run: |
+          echo "Testing AWS dynamic credentials from Vault..."
+          
+          # Verify AWS credentials are available
+          echo "AWS Access Key ID length: ${#AWS_ACCESS_KEY_ID}"
+          echo "AWS Secret Access Key length: ${#AWS_SECRET_ACCESS_KEY}"
+          echo "AWS Session Token length: ${#AWS_SESSION_TOKEN}"
+          
+          # Configure AWS CLI with the dynamic credentials
+          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+          aws configure set aws_session_token "$AWS_SESSION_TOKEN"
+          aws configure set region us-east-1
+          aws configure set output json
+          
+          echo ""
+          echo "Fetching AWS regions using dynamic credentials..."
+          aws ec2 describe-regions --region us-east-1
+          
+          echo ""
+          echo "AWS API call successful!"
+
+      - name: Additional AWS API tests
+        run: |
+          echo "Running additional AWS API tests..."
+          
+          # Test STS to verify the assumed role
+          echo "Current AWS identity:"
+          aws sts get-caller-identity
+          
+          echo ""
+          echo "Available regions (formatted):"
+          aws ec2 describe-regions --region us-east-1 --query 'Regions[].{Name:RegionName,Endpoint:Endpoint}' --output table
+          
+          echo ""
+          echo "Testing different region:"
+          aws ec2 describe-regions --region us-west-2 --query 'Regions[0:3].{Name:RegionName,Endpoint:Endpoint}' --output table
