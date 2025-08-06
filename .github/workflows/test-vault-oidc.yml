@@ -1,0 +1,70 @@
+name: Test HCPV OIDC Integration
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-vault-secrets:
+    runs-on: ubuntu-latest
+    
+    # Required permissions for OIDC
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Retrieve secrets from Vault
+        uses: hashicorp/vault-action@v3
+        with:
+          method: jwt
+          url: ${{ secrets.VAULT_URL }}
+          namespace: ${{ secrets.VAULT_NAMESPACE }}
+          role: github-actions-role
+          secrets: |
+            secret/data/github-actions/ci npmToken | NPM_TOKEN ;
+            secret/data/github-actions/ci apiKey | API_KEY ;
+            secret/data/github-actions/ci dbPassword | DB_PASSWORD ;
+            secret/data/ci/terraform tfToken | TF_TOKEN ;
+            secret/data/ci/terraform awsAccessKey | AWS_ACCESS_KEY ;
+            secret/data/ci/terraform awsSecretKey | AWS_SECRET_KEY
+
+      - name: Test retrieved secrets
+        run: |
+          echo "Successfully retrieved secrets from HCP Vault!"
+          echo "NPM Token length: ${#NPM_TOKEN}"
+          echo "API Key length: ${#API_KEY}"
+          echo "DB Password length: ${#DB_PASSWORD}"
+          echo "Terraform Token length: ${#TF_TOKEN}"
+          echo "AWS Access Key length: ${#AWS_ACCESS_KEY}"
+          echo "AWS Secret Key length: ${#AWS_SECRET_KEY}"
+          
+          # Verify secrets are not empty
+          if [ -n "$NPM_TOKEN" ] && [ -n "$API_KEY" ] && [ -n "$TF_TOKEN" ]; then
+            echo "All secrets retrieved successfully!"
+          else
+            echo "Some secrets are missing"
+            exit 1
+          fi
+          
+      - name: Example usage scenarios
+        run: |
+          echo "Example usage scenarios:"
+          echo "1. NPM operations:"
+          echo "   npm config set //registry.npmjs.org/:_authToken \$NPM_TOKEN"
+          
+          echo "2. Terraform Cloud operations:"
+          echo "   export TF_TOKEN_app_terraform_io=\$TF_TOKEN"
+          
+          echo "3. AWS operations:"
+          echo "   export AWS_ACCESS_KEY_ID=\$AWS_ACCESS_KEY"
+          echo "   export AWS_SECRET_ACCESS_KEY=\$AWS_SECRET_KEY"
+          
+          echo "4. Database operations:"
+          echo "   psql postgresql://user:\$DB_PASSWORD@host/db"
+          
+          echo "Integration test completed successfully!"
