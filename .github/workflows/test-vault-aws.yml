@@ -20,6 +20,7 @@ jobs:
       - name: Retrieve static secrets from Vault
         uses: hashicorp/vault-action@v3
         with:
+          exportToken: true
           method: jwt
           url: ${{ secrets.VAULT_URL }}
           namespace: ${{ secrets.VAULT_NAMESPACE }}
@@ -41,14 +42,10 @@ jobs:
             aws/creds/vault-demo-assumed-role secret_key | AWS_SECRET_ACCESS_KEY ;
             aws/creds/vault-demo-assumed-role security_token | AWS_SESSION_TOKEN
 
-      - name: Install AWS CLI
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
-
       - name: Test AWS credentials and describe regions
         run: |
+          echo "Using pre-installed AWS CLI:"
+          aws --version
           echo "Testing AWS dynamic credentials from Vault..."
           
           # Verify AWS credentials are available
@@ -70,10 +67,10 @@ jobs:
           echo ""
           echo "AWS API call successful!"
 
-      - name: Additional AWS API tests
+      - name: Other AWS API tests
         run: |
-          echo "Running additional AWS API tests..."
-          
+          echo "Running other AWS API tests..."
+
           # Test STS to verify the assumed role
           echo "Current AWS identity:"
           aws sts get-caller-identity
@@ -85,3 +82,12 @@ jobs:
           echo ""
           echo "Testing different region:"
           aws ec2 describe-regions --region us-west-2 --query 'Regions[0:3].{Name:RegionName,Endpoint:Endpoint}' --output table
+
+      - name: Revoke Vault token
+        if: always()
+        run: |
+          echo "Revoking Vault token..."
+          curl -X POST -sv \
+            -H "X-Vault-Token: ${{ env.VAULT_TOKEN }}" \
+            -H "X-Vault-Namespace: ${{ secrets.VAULT_NAMESPACE }}" \
+            "${{ secrets.VAULT_URL }}/v1/auth/token/revoke-self" || echo "Token revocation failed or token already expired"
